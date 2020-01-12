@@ -1,8 +1,20 @@
-import os, sys
-# path = '/home/wellington/Documents/fretebras/fretebras-site'
+import os, sys, mmap
 
-def modify_file():
-    pass
+def modify_file(filepath):
+
+    with open(filepath, 'r+') as file, \
+        mmap.mmap(file.fileno(), 0) as mm:
+                
+        http_to_https = mm.read().replace(b'http:', b'https:')
+        
+        print(http_to_https)
+        
+        mm.resize(len(http_to_https))             
+        mm.seek(0)
+        mm.write(http_to_https)
+        
+        mm.flush()
+        mm.close()
 
 def get_filepaths():    
 
@@ -18,7 +30,8 @@ def get_filepaths():
             file_ext = os.path.splitext(file)[-1]
             if file_ext in file_exts:
                 filepaths.append(os.path.join(root, file))
-    return filepaths
+    # print(filepaths)
+    modify_file(filepaths[0])
 
 def get_files_extensions():
     exts = input("Enter the file extensions you want to modify separated by " \
@@ -45,6 +58,7 @@ def get_project_path():
     print("Path entered: " + project_path)
     
     return project_path
+
 def main():
     # check if it's being executed directly
     if __name__ == "__main__":
